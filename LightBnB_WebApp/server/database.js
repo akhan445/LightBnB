@@ -24,9 +24,9 @@ const getUserWithEmail = function(email) {
     WHERE email = $1;
   `;
 
-  const values = [email];
+  const queryParams = [email];
 
-  return pool.query(queryString, values)
+  return pool.query(queryString, queryParams)
   .then(res => res.rows[0])
   .catch(err => {
     console.log(err.message);
@@ -47,9 +47,9 @@ const getUserWithId = function(id) {
     WHERE id = $1;
   `;
 
-  const values = [id];
+  const queryParams = [id];
 
-  return pool.query(queryString, values)
+  return pool.query(queryString, queryParams)
   .then(res => res.rows[0])
   .catch(err => {
     console.log(err.message);
@@ -72,9 +72,9 @@ const addUser =  function(user) {
     RETURNING *;
   `;
 
-  const values = [user.name, user.email, user.password];
+  const queryParams = [user.name, user.email, user.password];
 
-  return pool.query(queryString, values)
+  return pool.query(queryString, queryParams)
   .then(res => res.rows[0])
   .catch(err => {
     console.log(err.message);
@@ -99,9 +99,9 @@ const getAllReservations = function(guest_id, limit = 10) {
     WHERE guest_id = $1;
   `;
 
-  const values = [guest_id];
+  const queryParams = [guest_id];
 
-  return pool.query(queryString, values)
+  return pool.query(queryString, queryParams)
   .then(res => res.rows)
   .catch(err => {
     console.log(err,message);
@@ -181,9 +181,16 @@ exports.getAllProperties = getAllProperties;
  * @return {Promise<{}>} A promise to the property.
  */
 const addProperty = function(property) {
-  const propertyId = Object.keys(properties).length + 1;
-  property.id = propertyId;
-  properties[propertyId] = property;
-  return Promise.resolve(property);
+
+  const queryString = `
+    INSERT INTO properties(title, description, number_of_bedrooms, number_of_bathrooms, parking_spaces, cost_per_night, thumbnail_photo_url, cover_photo_url, street, country, city, province, post_code, owner_id)
+    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+    RETURNING *;
+  `;
+
+  const queryParams = Object.values(property);
+
+  return pool.query(queryString, queryParams).then((res) => res.rows);
+
 }
 exports.addProperty = addProperty;
