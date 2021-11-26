@@ -1,15 +1,4 @@
-const properties = require('./json/properties.json');
-const users = require('./json/users.json');
-/// Users
-
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  user: 'vagrant',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-})
+const db = require('./db');
 
 /**
  * Get a single user from the database given their email.
@@ -26,7 +15,7 @@ const getUserWithEmail = function(email) {
 
   const queryParams = [email];
 
-  return pool.query(queryString, queryParams)
+  return db.query(queryString, queryParams)
   .then(res => res.rows[0])
   .catch(err => {
     console.log(err.message);
@@ -49,7 +38,7 @@ const getUserWithId = function(id) {
 
   const queryParams = [id];
 
-  return pool.query(queryString, queryParams)
+  return db.query(queryString, queryParams)
   .then(res => res.rows[0])
   .catch(err => {
     console.log(err.message);
@@ -74,7 +63,7 @@ const addUser =  function(user) {
 
   const queryParams = [user.name, user.email, user.password];
 
-  return pool.query(queryString, queryParams)
+  return db.query(queryString, queryParams)
   .then(res => res.rows[0])
   .catch(err => {
     console.log(err.message);
@@ -101,7 +90,7 @@ const getAllReservations = function(guest_id, limit = 10) {
 
   const queryParams = [guest_id];
 
-  return pool.query(queryString, queryParams)
+  return db.query(queryString, queryParams)
   .then(res => res.rows)
   .catch(err => {
     console.log(err,message);
@@ -170,7 +159,7 @@ const getAllProperties = function(options, limit = 10) {
   ORDER BY cost_per_night
   LIMIT $${queryParams.length};`;
 
-  return pool.query(queryString, queryParams).then((res) => res.rows);
+  return db.query(queryString, queryParams).then((res) => res.rows);
 }
 exports.getAllProperties = getAllProperties;
 
@@ -190,7 +179,7 @@ const addProperty = function(property) {
 
   const queryParams = Object.values(property);
 
-  return pool.query(queryString, queryParams).then((res) => res.rows);
+  return db.query(queryString, queryParams).then((res) => res.rows);
 
 }
 exports.addProperty = addProperty;
